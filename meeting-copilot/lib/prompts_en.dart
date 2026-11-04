@@ -62,6 +62,7 @@ No eres un participante de la reunión. Eres un asesor privado que presenta reco
 Recibes la transcripción en vivo en inglés (reconocimiento de voz: puede tener errores y no distingue quién habla) y el contexto de la junta. Todas tus recomendaciones deben alinearse con ese contexto.
 
 Reglas:
+- Las líneas que empiezan con [YO] las dijo el usuario; las demás, la otra persona (si el usuario no marcó, puede haber mezcla). Nunca sugieras responder a lo que dijo el propio usuario; "te_preguntaron" es solo de lo que dijo la otra persona.
 - Enfócate en lo ÚLTIMO que se dijo. Cada punto se debe leer en 3 segundos.
 - El inglés que sugieras debe ser claro, profesional y fácil de pronunciar para un nivel B1–B2: frases cortas (máximo 20 palabras), vocabulario común, sin modismos raros.
 - "lectura": en español, una frase de qué está pasando o qué quiere la otra persona.
@@ -97,7 +98,7 @@ String enCoachPrompt(Meeting m, String transcript) {
     final min = DateTime.now().difference(m.translations.first.date).inMinutes;
     b.writeln('\nLa junta lleva $min minutos.');
   }
-  b.writeln('\nTranscripción en inglés (lo más reciente al final):');
+  b.writeln('\nTranscripción en inglés ([YO] = el usuario; lo más reciente al final):');
   b.writeln(transcript.isEmpty ? '(todavía no hay audio)' : transcript);
   return b.toString();
 }

@@ -24,6 +24,8 @@ class MeetingSession extends ChangeNotifier {
   String? copilotError;
   String? newsError;
   bool translating = false;
+  bool meSpeaking = false;
+  int _pending = 0;
   String? translateError;
   bool _disposed = false;
 
@@ -77,6 +79,7 @@ class MeetingSession extends ChangeNotifier {
     _translateTimer = null;
     await transcriber.stop();
     _translate(flush: true);
+    meSpeaking = false;
     WakelockPlus.disable();
     _saveNow();
   }
@@ -101,7 +104,22 @@ class MeetingSession extends ChangeNotifier {
   /// Traduce lo nuevo que se dijo: cuando la persona hace una pausa, o cada
   /// ~12 palabras dejando las últimas 3, que el dictado todavía corrige.
   Future<void> _translate({bool flush = false}) async {
-    if (translating) return;
+    final chunk = _takeChunk(flush: flush);
+    if (chunk != null) await _emit(chunk, me: meSpeaking);
+  }
+
+  /// Botón “Hablo yo”: lo dicho hasta ahora es de quien hablaba antes y lo
+  /// que sigue, del otro.
+  void toggleMe() {
+    final chunk = _takeChunk(flush: true);
+    final wasMe = meSpeaking;
+    meSpeaking = !meSpeaking;
+    notifyListeners();
+    if (chunk != null) _emit(chunk, me: wasMe);
+  }
+
+  /// Separa el siguiente fragmento por traducir, o null si todavía no toca.
+  String? _takeChunk({bool flush = false}) {
     final heard = _heard;
     if (_translated > heard.length) _translated = heard.length;
     // Si el dictado corrigió texto ya traducido, no partas una palabra.
@@ -114,40 +132,65 @@ class MeetingSession extends ChangeNotifier {
     _lastHeard = heard;
     final tail = heard.substring(_translated);
     final words = RegExp(r'\S+').allMatches(tail).toList();
-    if (words.isEmpty) return;
+    if (words.isEmpty) return null;
     var cut = tail.length;
     if (!flush && !(paused && words.length >= 2)) {
-      if (words.length < 12) return;
+      if (words.length < 12) return null;
       cut = words[words.length - 3].start;
       final end = tail.substring(0, cut).lastIndexOf(RegExp(r'[.?!]\s'));
       if (end > 30) cut = end + 1;
     }
-    final chunk = tail.substring(0, cut).trim();
     _translated += cut;
+    return tail.substring(0, cut).trim();
+  }
+
+  /// Agrega el fragmento de una vez (para conservar el orden) y, si es de la
+  /// otra persona, le pone la traducción cuando llega.
+  Future<void> _emit(String chunk, {required bool me}) async {
+    final prompt = translatePrompt(meeting, chunk);
+    final t = Translation(en: chunk, speaker: me ? 'yo' : '');
+    meeting.translations.add(t);
+    changed();
+    if (me) return;
+    _pending++;
     translating = true;
     notifyListeners();
     try {
       final j = await _client.generateJson(
         system: translateSystem,
-        prompt: translatePrompt(meeting, chunk),
+        prompt: prompt,
         schema: translateSchema,
         temperature: 0.2,
         thinkingLevel: 'low',
       );
-      final t = Translation(en: chunk, es: '${j['es'] ?? ''}', marca: j['marca'] == 'ninguna' ? '' : '${j['marca'] ?? ''}');
-      meeting.translations.add(t);
+      t.es = '${j['es'] ?? ''}';
+      t.marca = j['marca'] == 'ninguna' ? '' : '${j['marca'] ?? ''}';
       translateError = null;
       changed();
       // Si te preguntan o te piden algo, el copiloto responde de inmediato.
       if (t.marca == 'pregunta' || t.marca == 'solicitud') coach();
     } catch (e) {
-      meeting.translations.add(Translation(en: chunk, es: ''));
       translateError = e.toString();
-      changed();
     } finally {
-      translating = false;
+      _pending--;
+      translating = _pending > 0;
       if (!_disposed) notifyListeners();
     }
+  }
+
+  /// Lo dicho en la junta con [YO] en lo que dijo el usuario.
+  String get _labeledTranscript {
+    final b = StringBuffer();
+    for (final t in meeting.translations) {
+      b.writeln(t.isMe ? '[YO] ${t.en}' : t.en);
+    }
+    final heard = _heard;
+    if (_translated < heard.length) {
+      final rest = heard.substring(_translated).trim();
+      if (rest.isNotEmpty) b.writeln(meSpeaking ? '[YO] $rest' : rest);
+    }
+    final s = b.toString().trim();
+    return s.length > 8000 ? s.substring(s.length - 8000) : s;
   }
 
   // ---- Notas ----
@@ -175,8 +218,7 @@ class MeetingSession extends ChangeNotifier {
     try {
       final j = await _client.generateJson(
         system: enCoachSystem(settings.myRole, settings.englishLevel),
-        prompt: enCoachPrompt(meeting,
-            text.length > 8000 ? text.substring(text.length - 8000) : text),
+        prompt: enCoachPrompt(meeting, _labeledTranscript),
         schema: enCoachSchema,
         // En vivo importa la rapidez: ~5 s en vez de ~10 s.
         thinkingLevel: 'low',

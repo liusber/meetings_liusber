@@ -170,16 +170,21 @@ class Translation {
   final String id;
   final DateTime date;
   final String en;
-  final String es;
+  String es;
   /// '', 'pregunta', 'solicitud', 'decisión' o 'compromiso'.
-  final String marca;
+  String marca;
+  /// 'yo' si lo dijo el usuario (botón “Hablo yo”); '' si fue la otra persona.
+  final String speaker;
 
-  Translation({required this.en, required this.es, this.marca = '', String? id, DateTime? date})
+  bool get isMe => speaker == 'yo';
+
+  Translation(
+      {required this.en, this.es = '', this.marca = '', this.speaker = '', String? id, DateTime? date})
       : id = id ?? newId(),
         date = date ?? DateTime.now();
 
   Map<String, dynamic> toJson() =>
-      {'id': id, 'date': date.toIso8601String(), 'en': en, 'es': es, 'marca': marca};
+      {'id': id, 'date': date.toIso8601String(), 'en': en, 'es': es, 'marca': marca, 'speaker': speaker};
 
   factory Translation.fromJson(Map<String, dynamic> j) => Translation(
         id: j['id'],
@@ -187,6 +192,7 @@ class Translation {
         en: j['en'] ?? '',
         es: j['es'] ?? '',
         marca: j['marca'] ?? '',
+        speaker: j['speaker'] ?? '',
       );
 }
 

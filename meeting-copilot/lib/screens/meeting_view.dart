@@ -175,6 +175,28 @@ class _MeetingViewState extends State<MeetingView>
                 ),
                 label: Text(running ? 'Detener' : 'Escuchar junta'),
               ),
+              if (running) ...[
+                const SizedBox(width: 8),
+                s.meSpeaking
+                    ? FilledButton.icon(
+                        style: FilledButton.styleFrom(
+                          backgroundColor: cs.tertiary,
+                          foregroundColor: cs.onTertiary,
+                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                        ),
+                        onPressed: s.toggleMe,
+                        icon: const Icon(Icons.record_voice_over, size: 18),
+                        label: const Text('Hablas tú · toca al terminar'),
+                      )
+                    : OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                        ),
+                        onPressed: s.toggleMe,
+                        icon: const Icon(Icons.record_voice_over_outlined, size: 18),
+                        label: const Text('Hablo yo'),
+                      ),
+              ],
               const SizedBox(width: 12),
               Expanded(
                 child: Align(

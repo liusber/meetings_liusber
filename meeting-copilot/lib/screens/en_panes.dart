@@ -97,7 +97,7 @@ class _TranslationPaneState extends State<TranslationPane> {
                   if (partial.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
-                      child: Text('… $partial',
+                      child: Text('${s.meSpeaking ? 'Tú: ' : ''}… $partial',
                           style: TextStyle(color: cs.onSurfaceVariant, fontStyle: FontStyle.italic)),
                     ),
                 ],
@@ -119,6 +119,23 @@ class _TranslationTile extends StatelessWidget {
     final tt = Theme.of(context).textTheme;
     final mark = t.marca.isNotEmpty;
     final question = t.marca == 'pregunta' || t.marca == 'solicitud';
+    if (t.isMe) {
+      // Lo que dijiste tú: a la derecha, sin traducir.
+      return Container(
+        margin: const EdgeInsets.only(top: 8, left: 40),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: cs.surfaceContainerHigh,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('${_hhmm(t.date)}  TÚ',
+              style: tt.labelSmall?.copyWith(color: cs.onSurfaceVariant, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 4),
+          SelectableText(t.en, style: tt.bodyMedium),
+        ]),
+      );
+    }
     return Container(
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.all(10),

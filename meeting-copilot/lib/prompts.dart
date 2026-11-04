@@ -114,7 +114,10 @@ String minutaPrompt(Meeting m) {
       b.writeln('- ${n.text}');
     }
   }
-  final t = m.transcript;
+  // Si se usó la traducción, el texto viene marcado con quién habló.
+  final t = m.translations.isEmpty
+      ? m.transcript
+      : m.translations.map((t) => '${t.isMe ? 'Yo' : 'Otra persona'}: ${t.en}').join('\n');
   b.writeln('\nTranscripción:');
   b.writeln(t.length > 60000 ? t.substring(t.length - 60000) : t);
   return b.toString();
