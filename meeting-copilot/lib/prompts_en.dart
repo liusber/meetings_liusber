@@ -9,6 +9,10 @@ String meetingContext(Meeting m) {
   if (m.context.isNotEmpty) b.writeln('Contexto del proyecto o negocio: ${m.context}');
   if (m.misPreguntas.isNotEmpty) b.writeln('Preguntas que el usuario quiere hacer:\n${m.misPreguntas}');
   if (m.infoNecesaria.isNotEmpty) b.writeln('Información que necesita obtener:\n${m.infoNecesaria}');
+  if (m.estrategia.isNotEmpty) {
+    b.writeln('\nESTRATEGIA DEL USUARIO PARA ESTA JUNTA (tiene prioridad sobre las reglas generales, salvo la de no inventar datos):');
+    b.writeln(m.estrategia);
+  }
   return b.toString();
 }
 
@@ -67,6 +71,9 @@ Reglas:
 - "preguntas": hasta 3 preguntas estratégicas en inglés con su significado en español, que acerquen al objetivo: prioriza las preguntas que el usuario quería hacer y la información que necesita obtener y que todavía no se ha cubierto.
 - "pendientes": en español, hasta 3 cosas del objetivo o de la información necesaria que todavía no se han cubierto.
 - "acuerdos": en español, decisiones, compromisos, fechas o responsables que se acaban de mencionar. Vacío si no hay nuevos.
+- "ritmo": en español, máximo 15 palabras, cómo llevar el ritmo ahora: si conviene profundizar, escuchar, resumir lo entendido o pasar al siguiente punto del objetivo, considerando los minutos que lleva la junta. Vacío si va bien.
+- "recomendaciones": máximo 1 recomendación técnica en inglés con su significado en español, SOLO cuando ya haya información suficiente sobre la necesidad. Es una opinión técnica, no una oferta de servicios. Vacío si todavía falta información.
+- Distingue siempre una recomendación técnica de una oferta de servicios: no sugieras ofrecer servicios salvo que la estrategia lo permita.
 - "vocabulario": hasta 3 términos, siglas o expresiones en inglés que se acaban de decir y que pueden no entenderse, con su significado en español.
 - No repitas sugerencias ya dadas. Si todavía no hay contexto suficiente, deja las listas vacías.
 ''';
@@ -85,6 +92,10 @@ String enCoachPrompt(Meeting m, String transcript) {
     for (final p in prev) {
       b.writeln('- $p');
     }
+  }
+  if (m.translations.isNotEmpty) {
+    final min = DateTime.now().difference(m.translations.first.date).inMinutes;
+    b.writeln('\nLa junta lleva $min minutos.');
   }
   b.writeln('\nTranscripción en inglés (lo más reciente al final):');
   b.writeln(transcript.isEmpty ? '(todavía no hay audio)' : transcript);
@@ -113,7 +124,9 @@ const enCoachSchema = {
     'pendientes': {'type': 'ARRAY', 'items': {'type': 'STRING'}},
     'acuerdos': {'type': 'ARRAY', 'items': {'type': 'STRING'}},
     'vocabulario': _phrases,
+    'ritmo': {'type': 'STRING'},
+    'recomendaciones': _phrases,
   },
-  'required': ['lectura', 'te_preguntaron', 'respuestas', 'preguntas', 'pendientes', 'acuerdos', 'vocabulario'],
-  'propertyOrdering': ['lectura', 'te_preguntaron', 'respuestas', 'preguntas', 'pendientes', 'acuerdos', 'vocabulario'],
+  'required': ['lectura', 'te_preguntaron', 'respuestas', 'preguntas', 'ritmo', 'recomendaciones', 'pendientes', 'acuerdos', 'vocabulario'],
+  'propertyOrdering': ['lectura', 'te_preguntaron', 'respuestas', 'preguntas', 'ritmo', 'recomendaciones', 'pendientes', 'acuerdos', 'vocabulario'],
 };

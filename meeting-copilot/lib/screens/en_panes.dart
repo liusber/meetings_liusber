@@ -268,6 +268,15 @@ class _EnTipCard extends StatelessWidget {
                 child: Text('Te preguntaron: ${tip.tePreguntaron}',
                     style: tt.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
               ),
+            if (tip.ritmo.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Icon(Icons.speed, size: 16, color: cs.tertiary),
+                  const SizedBox(width: 6),
+                  Expanded(child: Text(tip.ritmo, style: tt.bodySmall?.copyWith(color: cs.tertiary))),
+                ]),
+              ),
             if (tip.respuestas.isNotEmpty) ...[
               label('Puedes responder'),
               for (final p in tip.respuestas) phrase(p),
@@ -275,6 +284,10 @@ class _EnTipCard extends StatelessWidget {
             if (tip.preguntas.isNotEmpty) ...[
               label('Pregunta tú'),
               for (final p in tip.preguntas) phrase(p),
+            ],
+            if (tip.recomendaciones.isNotEmpty) ...[
+              label('Recomendación técnica (no es oferta)'),
+              for (final p in tip.recomendaciones) phrase(p),
             ],
             if (tip.acuerdos.isNotEmpty) ...[
               label('Acuerdos y compromisos'),

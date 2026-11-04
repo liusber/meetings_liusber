@@ -27,6 +27,7 @@ class _MeetingViewState extends State<MeetingView>
   late final _objetivo = TextEditingController(text: s.meeting.objetivo);
   late final _preguntas = TextEditingController(text: s.meeting.misPreguntas);
   late final _info = TextEditingController(text: s.meeting.infoNecesaria);
+  late final _estrategia = TextEditingController(text: s.meeting.estrategia);
   final _note = TextEditingController();
   final _noteFocus = FocusNode();
   final _transcriptScroll = ScrollController();
@@ -55,7 +56,7 @@ class _MeetingViewState extends State<MeetingView>
   @override
   void dispose() {
     s.removeListener(_sync);
-    for (final c in [_title, _person, _email, _context, _objetivo, _preguntas, _info, _note]) {
+    for (final c in [_title, _person, _email, _context, _objetivo, _preguntas, _info, _estrategia, _note]) {
       c.dispose();
     }
     _noteFocus.dispose();
@@ -365,13 +366,14 @@ class _MeetingViewState extends State<MeetingView>
 
   /// Lo que quieres lograr; el copiloto lo usa para sugerir preguntas.
   Widget _goalsPane(BuildContext context) {
-    Widget box(TextEditingController c, String label, String hint, void Function(String) set) =>
+    Widget box(TextEditingController c, String label, String hint, void Function(String) set,
+            {int maxLines = 6}) =>
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
           child: TextField(
             controller: c,
             minLines: 2,
-            maxLines: 6,
+            maxLines: maxLines,
             decoration: InputDecoration(
               labelText: label,
               hintText: hint,
@@ -393,6 +395,9 @@ class _MeetingViewState extends State<MeetingView>
             (v) => s.meeting.misPreguntas = v),
         box(_info, 'Información que necesito obtener', 'Una por línea',
             (v) => s.meeting.infoNecesaria = v),
+        box(_estrategia, 'Estrategia e instrucciones para el copiloto',
+            'Pega aquí tu prompt para esta junta: prioridades, qué evitar, cómo quieres que te ayude',
+            (v) => s.meeting.estrategia = v, maxLines: 14),
       ],
     );
   }

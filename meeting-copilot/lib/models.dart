@@ -215,6 +215,8 @@ class EnTip {
   final List<String> pendientes;
   final List<String> acuerdos;
   final List<Phrase> vocabulario;
+  final String ritmo;
+  final List<Phrase> recomendaciones;
 
   EnTip({
     String? id,
@@ -226,6 +228,8 @@ class EnTip {
     this.pendientes = const [],
     this.acuerdos = const [],
     this.vocabulario = const [],
+    this.ritmo = '',
+    this.recomendaciones = const [],
   })  : id = id ?? newId(),
         date = date ?? DateTime.now();
 
@@ -235,7 +239,9 @@ class EnTip {
       preguntas.isEmpty &&
       pendientes.isEmpty &&
       acuerdos.isEmpty &&
-      vocabulario.isEmpty;
+      vocabulario.isEmpty &&
+      ritmo.trim().isEmpty &&
+      recomendaciones.isEmpty;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -247,6 +253,8 @@ class EnTip {
         'pendientes': pendientes,
         'acuerdos': acuerdos,
         'vocabulario': vocabulario.map((p) => p.toJson()).toList(),
+        'ritmo': ritmo,
+        'recomendaciones': recomendaciones.map((p) => p.toJson()).toList(),
       };
 
   factory EnTip.fromJson(Map<String, dynamic> j) => EnTip(
@@ -259,6 +267,8 @@ class EnTip {
         pendientes: _strings(j['pendientes']),
         acuerdos: _strings(j['acuerdos']),
         vocabulario: Phrase.list(j['vocabulario']),
+        ritmo: j['ritmo'] ?? '',
+        recomendaciones: Phrase.list(j['recomendaciones']),
       );
 }
 
@@ -272,6 +282,7 @@ class Meeting {
   String objetivo;
   String misPreguntas;
   String infoNecesaria;
+  String estrategia;
   String transcript;
   List<Note> notes;
   List<CoachTip> tips;
@@ -289,6 +300,7 @@ class Meeting {
     this.objetivo = '',
     this.misPreguntas = '',
     this.infoNecesaria = '',
+    this.estrategia = '',
     this.transcript = '',
     List<Note>? notes,
     List<CoachTip>? tips,
@@ -318,6 +330,7 @@ class Meeting {
         'objetivo': objetivo,
         'mis_preguntas': misPreguntas,
         'info_necesaria': infoNecesaria,
+        'estrategia': estrategia,
         'transcript': transcript,
         'notes': notes.map((n) => n.toJson()).toList(),
         'tips': tips.map((t) => t.toJson()).toList(),
@@ -336,6 +349,7 @@ class Meeting {
         objetivo: j['objetivo'] ?? '',
         misPreguntas: j['mis_preguntas'] ?? '',
         infoNecesaria: j['info_necesaria'] ?? '',
+        estrategia: j['estrategia'] ?? '',
         transcript: j['transcript'] ?? '',
         notes: (j['notes'] as List? ?? [])
             .map((e) => Note.fromJson((e as Map).cast()))
