@@ -223,6 +223,8 @@ class EnTip {
   final List<Phrase> vocabulario;
   final String ritmo;
   final List<Phrase> recomendaciones;
+  /// Ids de frases rápidas que aplican ahora (máximo 2).
+  final List<String> frasesRapidas;
 
   EnTip({
     String? id,
@@ -236,6 +238,7 @@ class EnTip {
     this.vocabulario = const [],
     this.ritmo = '',
     this.recomendaciones = const [],
+    this.frasesRapidas = const [],
   })  : id = id ?? newId(),
         date = date ?? DateTime.now();
 
@@ -247,7 +250,8 @@ class EnTip {
       acuerdos.isEmpty &&
       vocabulario.isEmpty &&
       ritmo.trim().isEmpty &&
-      recomendaciones.isEmpty;
+      recomendaciones.isEmpty &&
+      frasesRapidas.isEmpty;
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -261,6 +265,7 @@ class EnTip {
         'vocabulario': vocabulario.map((p) => p.toJson()).toList(),
         'ritmo': ritmo,
         'recomendaciones': recomendaciones.map((p) => p.toJson()).toList(),
+        'frases_rapidas': frasesRapidas,
       };
 
   factory EnTip.fromJson(Map<String, dynamic> j) => EnTip(
@@ -275,6 +280,7 @@ class EnTip {
         vocabulario: Phrase.list(j['vocabulario']),
         ritmo: j['ritmo'] ?? '',
         recomendaciones: Phrase.list(j['recomendaciones']),
+        frasesRapidas: _strings(j['frases_rapidas']).take(2).toList(),
       );
 }
 

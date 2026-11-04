@@ -46,6 +46,13 @@ class MeetingSession extends ChangeNotifier {
     _lastCoachedLength = meeting.transcript.length;
   }
 
+  /// Frases rápidas que el copiloto destacó hace poco (máximo 2).
+  Set<String> get highlightedPhrases {
+    final last = meeting.enTips.firstOrNull;
+    if (last == null || DateTime.now().difference(last.date) > const Duration(minutes: 3)) return {};
+    return last.frasesRapidas.take(2).toSet();
+  }
+
   GeminiClient get _client => GeminiClient(settings.apiKey, settings.model);
 
   String get liveTranscript => transcriber.partial.isEmpty

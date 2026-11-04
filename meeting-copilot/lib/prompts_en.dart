@@ -1,4 +1,5 @@
 import 'models.dart';
+import 'phrases.dart';
 
 /// Contexto de la junta que va en todos los prompts.
 String meetingContext(Meeting m) {
@@ -75,6 +76,9 @@ Reglas:
 - "ritmo": en español, máximo 15 palabras, cómo llevar el ritmo ahora: si conviene profundizar, escuchar, resumir lo entendido o pasar al siguiente punto del objetivo, considerando los minutos que lleva la junta. Vacío si va bien.
 - "recomendaciones": máximo 1 recomendación técnica en inglés con su significado en español, SOLO cuando ya haya información suficiente sobre la necesidad. Es una opinión técnica, no una oferta de servicios. Vacío si todavía falta información.
 - Distingue siempre una recomendación técnica de una oferta de servicios: no sugieras ofrecer servicios salvo que la estrategia lo permita.
+- "frases_rapidas": ids (máximo 2, nunca más) de las frases de ayuda rápida que el usuario podría decir AHORA según lo último que pasó; vacío si ninguna aplica claramente. Frases:
+${[for (final g in quickPhrases.entries) for (final p in g.value) '  ${p.id}. "${p.en}" (${g.key.toLowerCase()}: ${p.uso.toLowerCase()})'].join('\n')}
+  Ejemplos: si la otra persona habla muy rápido o usa muchos términos técnicos seguidos → 1 o 2; si le preguntan algo difícil → 11 o 10; si explicó algo abstracto → 4 o 6.
 - "vocabulario": hasta 3 términos, siglas o expresiones en inglés que se acaban de decir y que pueden no entenderse, con su significado en español.
 - No repitas sugerencias ya dadas. Si todavía no hay contexto suficiente, deja las listas vacías.
 ''';
@@ -95,8 +99,14 @@ String enCoachPrompt(Meeting m, String transcript) {
     }
   }
   if (m.translations.isNotEmpty) {
-    final min = DateTime.now().difference(m.translations.first.date).inMinutes;
+    final now = DateTime.now();
+    final min = now.difference(m.translations.first.date).inMinutes;
     b.writeln('\nLa junta lleva $min minutos.');
+    // Ritmo de la otra persona: más de ~160 palabras por minuto es rápido.
+    final words = m.translations
+        .where((t) => !t.isMe && now.difference(t.date).inSeconds <= 60)
+        .fold<int>(0, (n, t) => n + t.en.split(RegExp(r'\s+')).length);
+    if (words > 0) b.writeln('La otra persona dijo ~$words palabras en el último minuto.');
   }
   b.writeln('\nTranscripción en inglés ([YO] = el usuario; lo más reciente al final):');
   b.writeln(transcript.isEmpty ? '(todavía no hay audio)' : transcript);
@@ -115,7 +125,7 @@ const _phrases = {
   },
 };
 
-const enCoachSchema = {
+final enCoachSchema = <String, dynamic>{
   'type': 'OBJECT',
   'properties': {
     'lectura': {'type': 'STRING'},
@@ -127,7 +137,14 @@ const enCoachSchema = {
     'vocabulario': _phrases,
     'ritmo': {'type': 'STRING'},
     'recomendaciones': _phrases,
+    'frases_rapidas': {
+      'type': 'ARRAY',
+      'items': {
+        'type': 'STRING',
+        'enum': [for (final g in quickPhrases.values) for (final p in g) p.id],
+      },
+    },
   },
-  'required': ['lectura', 'te_preguntaron', 'respuestas', 'preguntas', 'ritmo', 'recomendaciones', 'pendientes', 'acuerdos', 'vocabulario'],
-  'propertyOrdering': ['lectura', 'te_preguntaron', 'respuestas', 'preguntas', 'ritmo', 'recomendaciones', 'pendientes', 'acuerdos', 'vocabulario'],
+  'required': ['lectura', 'te_preguntaron', 'respuestas', 'preguntas', 'ritmo', 'recomendaciones', 'frases_rapidas', 'pendientes', 'acuerdos', 'vocabulario'],
+  'propertyOrdering': ['lectura', 'te_preguntaron', 'respuestas', 'preguntas', 'ritmo', 'recomendaciones', 'frases_rapidas', 'pendientes', 'acuerdos', 'vocabulario'],
 };

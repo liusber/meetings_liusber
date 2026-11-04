@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../models.dart';
+import '../phrases.dart';
 import '../session.dart';
+import 'phrases_panes.dart';
 
 String _hhmm(DateTime d) {
   final t = d.toLocal();
@@ -189,6 +191,23 @@ class EnCopilotPane extends StatelessWidget {
           icon: const Icon(Icons.bolt),
           label: const Text('¿Qué digo?'),
         ),
+      ),
+      // Siempre a la vista, aunque la IA esté procesando.
+      Padding(
+        padding: const EdgeInsets.fromLTRB(12, 0, 12, 4),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          for (final id in session.highlightedPhrases)
+            if (quickPhraseById[id] case final p?) QuickPhraseTile(phrase: p, highlighted: true),
+          const SizedBox(height: 6),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: OutlinedButton.icon(
+              onPressed: () => copyPhrase(context, quickPhraseById['11']!.en),
+              icon: const Icon(Icons.hourglass_bottom, size: 16),
+              label: const Text('Necesito tiempo: “Let me think for a second.”'),
+            ),
+          ),
+        ]),
       ),
       if (session.copilotError != null)
         Padding(

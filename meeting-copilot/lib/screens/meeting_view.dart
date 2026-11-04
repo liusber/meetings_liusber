@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../session.dart';
 import '../store.dart';
 import 'en_panes.dart';
+import 'phrases_panes.dart';
 import 'minuta_screen.dart';
 import 'resizable_row.dart';
 
@@ -96,22 +97,39 @@ class _MeetingViewState extends State<MeetingView>
                             children: [
                               translation,
                               guide,
-                              Column(
-                                children: [
-                                  _columnTitle(
-                                    context,
-                                    Icons.flag_outlined,
-                                    'Tu objetivo',
-                                  ),
-                                  Expanded(flex: 3, child: _goalsPane(context)),
-                                  const Divider(height: 1),
-                                  Expanded(flex: 2, child: _notesPane(context)),
-                                ],
+                              DefaultTabController(
+                                length: 3,
+                                child: Column(
+                                  children: [
+                                    const TabBar(
+                                      tabs: [
+                                        Tab(text: 'Frases'),
+                                        Tab(text: 'Conectores'),
+                                        Tab(text: 'Objetivo y notas'),
+                                      ],
+                                    ),
+                                    Expanded(
+                                      child: TabBarView(
+                                        children: [
+                                          QuickPhrasesPane(session: s),
+                                          const ConnectorsPane(),
+                                          Column(
+                                            children: [
+                                              Expanded(flex: 3, child: _goalsPane(context)),
+                                              const Divider(height: 1),
+                                              Expanded(flex: 2, child: _notesPane(context)),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           )
                         : DefaultTabController(
-                            length: 4,
+                            length: 6,
                             child: Column(
                               children: [
                                 const TabBar(
@@ -120,6 +138,8 @@ class _MeetingViewState extends State<MeetingView>
                                   tabs: [
                                     Tab(text: 'Traducción'),
                                     Tab(text: 'Copiloto'),
+                                    Tab(text: 'Frases'),
+                                    Tab(text: 'Conectores'),
                                     Tab(text: 'Objetivo'),
                                     Tab(text: 'Notas'),
                                   ],
@@ -129,6 +149,8 @@ class _MeetingViewState extends State<MeetingView>
                                     children: [
                                       translation,
                                       guide,
+                                      QuickPhrasesPane(session: s),
+                                      const ConnectorsPane(),
                                       _goalsPane(context),
                                       _notesPane(context),
                                     ],
@@ -286,18 +308,6 @@ class _MeetingViewState extends State<MeetingView>
     selected: {_tabs.index},
     onSelectionChanged: (v) => setState(() => _tabs.index = v.first),
   );
-
-  Widget _columnTitle(BuildContext context, IconData icon, String text) =>
-      Padding(
-        padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
-        child: Row(
-          children: [
-            Icon(icon, color: Theme.of(context).colorScheme.secondary),
-            const SizedBox(width: 8),
-            Text(text, style: Theme.of(context).textTheme.titleSmall),
-          ],
-        ),
-      );
 
   Widget _field(
     TextEditingController c,
