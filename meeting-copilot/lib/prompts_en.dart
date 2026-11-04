@@ -9,6 +9,9 @@ String meetingContext(Meeting m) {
   if (m.objetivo.isNotEmpty) b.writeln('Objetivo principal: ${m.objetivo}');
   if (m.context.isNotEmpty) b.writeln('Contexto del proyecto o negocio: ${m.context}');
   if (m.misPreguntas.isNotEmpty) b.writeln('Preguntas que el usuario quiere hacer:\n${m.misPreguntas}');
+  if (m.preguntasHechas.isNotEmpty) {
+    b.writeln('Ya hizo estas (no las vuelvas a sugerir):\n${m.preguntasHechas.join('\n')}');
+  }
   if (m.infoNecesaria.isNotEmpty) b.writeln('Información que necesita obtener:\n${m.infoNecesaria}');
   if (m.estrategia.isNotEmpty) {
     b.writeln('\nESTRATEGIA DEL USUARIO PARA ESTA JUNTA (tiene prioridad sobre las reglas generales, salvo la de no inventar datos):');

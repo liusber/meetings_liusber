@@ -103,7 +103,7 @@ class _MeetingViewState extends State<MeetingView>
                                   children: [
                                     const TabBar(
                                       tabs: [
-                                        Tab(text: 'Frases'),
+                                        Tab(text: 'Preguntas y frases'),
                                         Tab(text: 'Conectores'),
                                         Tab(text: 'Objetivo y notas'),
                                       ],
@@ -138,7 +138,7 @@ class _MeetingViewState extends State<MeetingView>
                                   tabs: [
                                     Tab(text: 'Traducción'),
                                     Tab(text: 'Copiloto'),
-                                    Tab(text: 'Frases'),
+                                    Tab(text: 'Preguntas'),
                                     Tab(text: 'Conectores'),
                                     Tab(text: 'Objetivo'),
                                     Tab(text: 'Notas'),

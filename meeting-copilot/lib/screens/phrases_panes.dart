@@ -63,9 +63,48 @@ class QuickPhrasesPane extends StatelessWidget {
     final tt = Theme.of(context).textTheme;
     final cs = Theme.of(context).colorScheme;
     final hl = session.highlightedPhrases;
+    final m = session.meeting;
+    final mine = m.misPreguntas.split('\n').map((l) => l.trim()).where((l) => l.isNotEmpty).toList();
     return ListView(
       padding: const EdgeInsets.fromLTRB(12, 4, 12, 16),
       children: [
+        if (mine.isNotEmpty) ...[
+          Padding(
+            padding: const EdgeInsets.only(top: 6, bottom: 2),
+            child: Text('Tus preguntas  ${m.preguntasHechas.where(mine.contains).length}/${mine.length}',
+                style: tt.labelLarge?.copyWith(color: cs.primary, fontWeight: FontWeight.w700)),
+          ),
+          for (final q in mine)
+            Builder(builder: (context) {
+              final done = m.preguntasHechas.contains(q);
+              return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Checkbox(
+                  value: done,
+                  onChanged: (v) {
+                    v == true ? m.preguntasHechas.add(q) : m.preguntasHechas.remove(q);
+                    session.changed();
+                  },
+                ),
+                Expanded(
+                  child: InkWell(
+                    onTap: () => copyPhrase(context, q),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Text(q,
+                          style: tt.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: done ? cs.onSurfaceVariant : null,
+                            decoration: done ? TextDecoration.lineThrough : null,
+                          )),
+                    ),
+                  ),
+                ),
+              ]);
+            }),
+          const SizedBox(height: 8),
+          const Divider(height: 1),
+          const SizedBox(height: 8),
+        ],
         Text('Un clic copia la frase. ★ = la recomienda el copiloto ahora.',
             style: tt.bodySmall?.copyWith(color: cs.onSurfaceVariant)),
         for (final g in quickPhrases.entries) ...[

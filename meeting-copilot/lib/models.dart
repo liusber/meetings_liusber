@@ -295,6 +295,8 @@ class Meeting {
   String misPreguntas;
   String infoNecesaria;
   String estrategia;
+  /// Preguntas de [misPreguntas] que ya hiciste.
+  List<String> preguntasHechas;
   String transcript;
   List<Note> notes;
   List<CoachTip> tips;
@@ -313,6 +315,7 @@ class Meeting {
     this.misPreguntas = '',
     this.infoNecesaria = '',
     this.estrategia = '',
+    List<String>? preguntasHechas,
     this.transcript = '',
     List<Note>? notes,
     List<CoachTip>? tips,
@@ -322,6 +325,7 @@ class Meeting {
   })  : id = id ?? newId(),
         date = date ?? DateTime.now(),
         notes = notes ?? [],
+        preguntasHechas = preguntasHechas ?? [],
         tips = tips ?? [],
         enTips = enTips ?? [],
         translations = translations ?? [];
@@ -343,6 +347,7 @@ class Meeting {
         'mis_preguntas': misPreguntas,
         'info_necesaria': infoNecesaria,
         'estrategia': estrategia,
+        'preguntas_hechas': preguntasHechas,
         'transcript': transcript,
         'notes': notes.map((n) => n.toJson()).toList(),
         'tips': tips.map((t) => t.toJson()).toList(),
@@ -362,6 +367,7 @@ class Meeting {
         misPreguntas: j['mis_preguntas'] ?? '',
         infoNecesaria: j['info_necesaria'] ?? '',
         estrategia: j['estrategia'] ?? '',
+        preguntasHechas: _strings(j['preguntas_hechas']),
         transcript: j['transcript'] ?? '',
         notes: (j['notes'] as List? ?? [])
             .map((e) => Note.fromJson((e as Map).cast()))
