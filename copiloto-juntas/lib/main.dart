@@ -21,7 +21,7 @@ class CopilotoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Auren',
+      title: 'Copiloto Juntas',
       debugShowCheckedModeBanner: false,
       theme: appleTheme(Brightness.light),
       darkTheme: appleTheme(Brightness.dark),

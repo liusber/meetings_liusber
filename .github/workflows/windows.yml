@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        app: [copiloto-juntas, meeting-copilot]
+        app: [copiloto-juntas, meeting-copilot, auren]
     defaults:
       run:
         working-directory: ${{ matrix.app }}
