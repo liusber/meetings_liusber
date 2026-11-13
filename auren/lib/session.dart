@@ -41,7 +41,7 @@ class MeetingSession extends ChangeNotifier {
   /// Apple) y se renuevan cada [AppSettings.newsMin] minutos, escuches o no.
   /// Las juntas viejas no buscan noticias.
   Future<void> _startNews() async {
-    if (settings.newsMin <= 0 || settings.apiKey.isEmpty) return;
+    if (settings.newsMin <= 0 || settings.activeKey.isEmpty) return;
     if (DateTime.now().difference(meeting.date) > const Duration(hours: 12)) return;
     _newsTimer = Timer.periodic(
         Duration(minutes: settings.newsMin), (_) => news(apple: (_newsRound++).isOdd));
@@ -54,7 +54,7 @@ class MeetingSession extends ChangeNotifier {
     if (!_disposed) await news(apple: true);
   }
 
-  ClaudeClient get _client => ClaudeClient(settings.apiKey, settings.model);
+  ClaudeClient get _client => ClaudeClient(settings.activeKey, settings.model);
 
   String get liveTranscript => transcriber.partial.isEmpty
       ? meeting.transcript

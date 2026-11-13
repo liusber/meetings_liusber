@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.settings.apiKey.isEmpty) {
+    if (widget.settings.activeKey.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _openSettings());
     }
   }

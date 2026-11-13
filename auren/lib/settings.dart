@@ -5,6 +5,10 @@ class AppSettings extends ChangeNotifier {
   late SharedPreferences _p;
 
   String apiKey = '';
+  /// Key de demo que se mete al compilar (--dart-define=DEMO_KEY=...); nunca va en git.
+  static const _demoKey = String.fromEnvironment('DEMO_KEY');
+  /// La key que se usa: la de Ajustes o, si está vacía, la de demo.
+  String get activeKey => apiKey.isNotEmpty ? apiKey : _demoKey;
   String model = 'claude-opus-5-5';
   String myName = '';
   String myRole = 'Responsable de TI en un grupo automotriz';
