@@ -58,7 +58,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   CwlCatchException: 7acc161b299a6de7f0a46a6ed741eae2c8b4d75a
   CwlCatchExceptionSupport: 54ccab8d8c78907b57f99717fb19d4cc3bce02dc
-  dictation: 1ab9d18e876a187ee2b2e039527a9dc2200192ed
+  dictation: 264bb1039219b85162a90c75bd502f2b18cf5c2e
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   share_plus: eccd7beb7cea61271aeed1800e8ccb2b952c0c7f
