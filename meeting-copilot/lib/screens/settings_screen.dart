@@ -163,7 +163,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Privacidad: la transcripción y tus notas se guardan solo en este equipo. '
+              'Privacidad: la transcripción y tus notas se guardan solo en este equipo; en Mac y iPhone el audio se transcribe sin salir de él. '
               'Para darte sugerencias se envía un fragmento a Gemini (Google). '
               'Avisa a la otra persona que estás transcribiendo.',
               style: Theme.of(context).textTheme.bodySmall,

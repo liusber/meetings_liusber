@@ -83,6 +83,11 @@ public class DictationPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     guard let r = SFSpeechRecognizer(locale: locale) else {
       throw err("El reconocimiento de voz no está disponible para \(localeId).")
     }
+    // El audio de la junta no sale del equipo: sin modelo local no se transcribe.
+    guard r.supportsOnDeviceRecognition else {
+      throw err("Para transcribir sin mandar el audio a internet, descarga el idioma \(localeId) "
+        + "en Ajustes del Sistema → Teclado → Dictado (en iPhone: Ajustes → General → Teclado → Dictado).")
+    }
     recognizer = r
     #if os(iOS)
     let session = AVAudioSession.sharedInstance()
@@ -143,6 +148,7 @@ public class DictationPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     let req = SFSpeechAudioBufferRecognitionRequest()
     req.shouldReportPartialResults = true
     req.taskHint = .dictation
+    req.requiresOnDeviceRecognition = true
     if #available(iOS 16.0, macOS 13.0, *) { req.addsPunctuation = true }
     requestLock.lock()
     request = req
