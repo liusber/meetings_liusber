@@ -35,9 +35,10 @@ class ClaudeClient {
         'system': system,
         'messages': messages,
         'tools': [
-          {'type': 'web_search_20260209', 'name': 'web_search', 'max_uses': 3},
+          {'type': 'web_search_20260209', 'name': 'web_search', 'max_uses': 5},
         ],
-        'output_config': {'effort': 'low'},
+        // Revisar fechas de varias páginas pide algo más de esfuerzo.
+        'output_config': {'effort': 'medium'},
       });
       if (data['stop_reason'] != 'pause_turn' || ++rounds >= 3) break;
       messages.add({'role': 'assistant', 'content': data['content']});

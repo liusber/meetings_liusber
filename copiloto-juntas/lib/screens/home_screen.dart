@@ -141,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final appBar = AppBar(
       title: const Text('Juntas'),
       actions: [
-        IconButton(tooltip: 'Libreta IT', icon: const Icon(Icons.lightbulb_outline), onPressed: _openLibreta),
+        IconButton(tooltip: 'Libreta de metáforas', icon: const Icon(Icons.lightbulb_outline), onPressed: _openLibreta),
         IconButton(tooltip: 'Ajustes', icon: const Icon(Icons.settings_outlined), onPressed: _openSettings),
       ],
     );

@@ -189,12 +189,12 @@ class _TipCard extends StatelessWidget {
                     ]),
                   ),
                   IconButton(
-                    tooltip: 'Guardar en Libreta IT',
+                    tooltip: 'Guardar en Libreta de metáforas',
                     icon: Icon(Icons.bookmark_add_outlined, color: cs.onSecondaryContainer),
                     onPressed: () {
                       store.addToLibreta(tip.notaIT);
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text('Guardado en tu Libreta IT'), duration: Duration(seconds: 1)));
+                          content: Text('Guardado en tu Libreta de metáforas'), duration: Duration(seconds: 1)));
                     },
                   ),
                 ]),
@@ -234,12 +234,12 @@ class _TipCard extends StatelessWidget {
           ]),
         ),
         IconButton(
-          tooltip: 'Guardar en Libreta IT',
+          tooltip: 'Guardar en Libreta de metáforas',
           icon: Icon(Icons.bookmark_add_outlined, color: cs.onTertiaryContainer),
           onPressed: () {
             store.addToLibreta(tip.noticiaFuente.isEmpty ? text : '$text (${tip.noticiaFuente})');
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Guardado en tu Libreta IT'), duration: Duration(seconds: 1)));
+                content: Text('Guardado en tu Libreta de metáforas'), duration: Duration(seconds: 1)));
           },
         ),
       ]),

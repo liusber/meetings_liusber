@@ -33,7 +33,7 @@ class _LibretaScreenState extends State<LibretaScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Libreta IT')),
+      appBar: AppBar(title: const Text('Libreta de metáforas')),
       body: ListenableBuilder(
         listenable: widget.store,
         builder: (context, _) {

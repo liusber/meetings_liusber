@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'models.dart';
 
 /// Guarda cada junta como un JSON en la carpeta de soporte de la app,
-/// y la "Libreta IT" (datos y metáforas guardadas) en libreta.json.
+/// y la "Libreta de metáforas" (datos y metáforas guardadas) en libreta.json.
 class MeetingStore extends ChangeNotifier {
   late final Directory _dir;
   List<Meeting> meetings = [];
