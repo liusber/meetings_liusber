@@ -10,6 +10,8 @@ class AppSettings extends ChangeNotifier {
   String myRole =
       'Gerente de TI: desarrollo de software, infraestructura, ciberseguridad, arquitectura y gestión de proyectos';
   String localeId = 'en_US';
+  /// Transcribir sin que el audio salga del equipo (Mac y iPhone; algo menos preciso).
+  bool privateAudio = false;
   String englishLevel = 'B1, en camino a B2';
   int intervalSec = 30;
   int newsMin = 0; // 0 = sin noticias automáticas
@@ -20,6 +22,7 @@ class AppSettings extends ChangeNotifier {
     _p = await SharedPreferences.getInstance();
     apiKey = _p.getString('apiKey') ?? apiKey;
     model = _p.getString('model') ?? model;
+    privateAudio = _p.getBool('privateAudio') ?? privateAudio;
     myName = _p.getString('myName') ?? myName;
     myRole = _p.getString('myRole') ?? myRole;
     localeId = _p.getString('localeId') ?? localeId;
@@ -36,6 +39,7 @@ class AppSettings extends ChangeNotifier {
     String? myName,
     String? myRole,
     String? localeId,
+    bool? privateAudio,
     String? englishLevel,
     int? intervalSec,
     int? newsMin,
@@ -46,6 +50,7 @@ class AppSettings extends ChangeNotifier {
     if (myName != null) await _p.setString('myName', this.myName = myName);
     if (myRole != null) await _p.setString('myRole', this.myRole = myRole);
     if (localeId != null) await _p.setString('localeId', this.localeId = localeId);
+    if (privateAudio != null) await _p.setBool('privateAudio', this.privateAudio = privateAudio);
     if (englishLevel != null) {
       await _p.setString('englishLevel', this.englishLevel = englishLevel);
     }

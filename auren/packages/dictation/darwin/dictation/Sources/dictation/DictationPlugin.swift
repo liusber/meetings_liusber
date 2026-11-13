@@ -18,6 +18,8 @@ public class DictationPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
   private var recognizer: SFSpeechRecognizer?
   private var request: SFSpeechAudioBufferRecognitionRequest?
   private var task: SFSpeechRecognitionTask?
+  private var onDevice = false
+  private var vocabulary: [String] = []
   private let requestLock = NSLock()
   private var running = false
   private var tapInstalled = false
@@ -52,7 +54,10 @@ public class DictationPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     case "authorize":
       authorize { ok in DispatchQueue.main.async { result(ok) } }
     case "start":
-      let locale = (call.arguments as? [String: Any])?["locale"] as? String ?? "es_MX"
+      let args = call.arguments as? [String: Any]
+      let locale = args?["locale"] as? String ?? "es_MX"
+      onDevice = args?["onDevice"] as? Bool ?? false
+      vocabulary = args?["vocabulary"] as? [String] ?? []
       do {
         try start(locale)
         result(nil)
@@ -83,9 +88,9 @@ public class DictationPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     guard let r = SFSpeechRecognizer(locale: locale) else {
       throw err("El reconocimiento de voz no está disponible para \(localeId).")
     }
-    // El audio de la junta no sale del equipo: sin modelo local no se transcribe.
-    guard r.supportsOnDeviceRecognition else {
-      throw err("Para transcribir sin mandar el audio a internet, descarga el idioma \(localeId) "
+    // En modo privado el audio no sale del equipo: sin modelo local no se transcribe.
+    guard !onDevice || r.supportsOnDeviceRecognition else {
+      throw err("Para la transcripción privada (sin mandar el audio a internet), descarga el idioma \(localeId) "
         + "en Ajustes del Sistema → Teclado → Dictado (en iPhone: Ajustes → General → Teclado → Dictado).")
     }
     recognizer = r
@@ -148,7 +153,9 @@ public class DictationPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     let req = SFSpeechAudioBufferRecognitionRequest()
     req.shouldReportPartialResults = true
     req.taskHint = .dictation
-    req.requiresOnDeviceRecognition = true
+    req.requiresOnDeviceRecognition = onDevice
+    // Palabras que se esperan en la junta (siglas, nombres): mejora su reconocimiento.
+    req.contextualStrings = vocabulary
     if #available(iOS 16.0, macOS 13.0, *) { req.addsPunctuation = true }
     requestLock.lock()
     request = req

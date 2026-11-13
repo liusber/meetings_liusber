@@ -61,12 +61,35 @@ class MeetingSession extends ChangeNotifier {
 
   // ---- Escuchar ----
 
+  /// Términos que se esperan en la junta: los de TI más comunes y las palabras
+  /// con mayúscula o siglas de los datos de la junta (nombres, empresas, sistemas).
+  List<String> _vocabulary() {
+    final words = <String>{..._techTerms};
+    final text = '${meeting.title} ${meeting.person} ${meeting.context}';
+    for (final m in RegExp(r"\b[A-ZÁÉÍÓÚÑ][\wÁÉÍÓÚÑáéíóúñ.&-]{1,}\b").allMatches(text)) {
+      words.add(m[0]!);
+    }
+    return words.take(100).toList();
+  }
+
+  static const _techTerms = [
+    'CRM', 'ERP', 'DMS', 'API', 'APIs', 'SAP', 'Salesforce', 'HubSpot', 'Dynamics', 'Oracle',
+    'WhatsApp', 'Teams', 'Zoom', 'Outlook', 'Excel', 'Power BI', 'SQL', 'MySQL', 'Postgres',
+    'Azure', 'AWS', 'Google Cloud', 'nube', 'cloud', 'SaaS', 'on-premise', 'VPN', 'firewall',
+    'ciberseguridad', 'backup', 'RPA', 'bot', 'chatbot', 'IA', 'Gemini', 'Claude', 'ChatGPT',
+    'Python', 'Java', 'JavaScript', 'Flutter', 'Git', 'GitHub', 'Jira', 'sprint', 'backlog',
+    'deploy', 'servidor', 'base de datos', 'integración', 'webhook', 'token', 'dashboard',
+    'KPI', 'ROI', 'SLA', 'TI', 'Kia', 'Honda', 'Changan',
+  ];
+
+
   Future<void> toggleListening() async {
     if (transcriber.isRunning) {
       await stop();
       return;
     }
-    final ok = await transcriber.start(settings.localeId);
+    final ok = await transcriber.start(settings.localeId,
+        onDevice: settings.privateAudio, vocabulary: _vocabulary());
     if (!ok) return;
     WakelockPlus.enable();
     _coachTimer?.cancel();

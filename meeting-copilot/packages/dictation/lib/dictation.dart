@@ -16,8 +16,12 @@ class Dictation {
   static Future<bool> authorize() async =>
       await _methods.invokeMethod<bool>('authorize') ?? false;
 
-  static Future<void> start(String localeId) =>
-      _methods.invokeMethod('start', {'locale': localeId});
+  /// [onDevice]: el audio no sale del equipo (algo menos preciso).
+  /// [vocabulary]: palabras que se esperan (siglas, nombres) para reconocerlas mejor.
+  static Future<void> start(String localeId,
+          {bool onDevice = false, List<String> vocabulary = const []}) =>
+      _methods.invokeMethod(
+          'start', {'locale': localeId, 'onDevice': onDevice, 'vocabulary': vocabulary});
 
   static Future<void> stop() => _methods.invokeMethod('stop');
 }

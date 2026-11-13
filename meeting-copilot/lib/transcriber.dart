@@ -32,9 +32,15 @@ class Transcriber extends ChangeNotifier {
 
   bool get isRunning => _want;
 
-  Future<bool> start(String localeId) async {
+  bool _onDevice = false;
+
+  /// [onDevice]: transcripción privada (el audio no sale del equipo).
+  /// [vocabulary]: palabras esperadas en la junta, para reconocerlas mejor.
+  Future<bool> start(String localeId,
+      {bool onDevice = false, List<String> vocabulary = const []}) async {
     error = null;
-    if (_native) return _startNative(localeId);
+    _onDevice = onDevice;
+    if (_native) return _startNative(localeId, onDevice, vocabulary);
     if (!_ready) {
       try {
         _ready = await _stt.initialize(onStatus: _onStatus, onError: _onError);
@@ -70,7 +76,7 @@ class Transcriber extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> _startNative(String localeId) async {
+  Future<bool> _startNative(String localeId, bool onDevice, List<String> vocabulary) async {
     if (!_ready) {
       _ready = await Dictation.authorize();
       if (!_ready) {
@@ -94,7 +100,7 @@ class Transcriber extends ChangeNotifier {
       notifyListeners();
     });
     try {
-      await Dictation.start(localeId);
+      await Dictation.start(localeId, onDevice: onDevice, vocabulary: vocabulary);
     } catch (e) {
       error = 'El micrófono falló: ${e is PlatformException ? e.message : e}';
       await _events?.cancel();
@@ -121,6 +127,9 @@ class Transcriber extends ChangeNotifier {
           listenMode: ListenMode.dictation,
           cancelOnError: false,
           autoPunctuation: true,
+          // Transcripción privada en Android: el reconocedor del teléfono cuando
+          // lo tiene; si no, el sistema prefiere sin conexión.
+          onDevice: Platform.isAndroid && _onDevice,
         ),
       );
     } catch (e) {
@@ -165,6 +174,13 @@ class Transcriber extends ChangeNotifier {
     if (e.errorMsg.contains('permission')) {
       _want = false;
       error = 'Sin permiso de micrófono o reconocimiento de voz.';
+      notifyListeners();
+      return;
+    }
+    if (e.errorMsg.contains('language')) {
+      _want = false;
+      error = 'Falta el idioma para transcribir sin internet. En el teléfono: Ajustes → '
+          'Sistema → Idiomas → Reconocimiento de voz sin conexión, y descarga el idioma de la junta.';
       notifyListeners();
       return;
     }

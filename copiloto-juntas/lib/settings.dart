@@ -9,6 +9,8 @@ class AppSettings extends ChangeNotifier {
   String myName = '';
   String myRole = 'Responsable de TI en un grupo automotriz';
   String localeId = 'es_MX';
+  /// Transcribir sin que el audio salga del equipo (Mac y iPhone; algo menos preciso).
+  bool privateAudio = false;
   int intervalSec = 30;
   int newsMin = 3; // 0 = sin noticias automáticas
   /// Proporción de ancho de las 3 columnas de la junta.
@@ -18,6 +20,7 @@ class AppSettings extends ChangeNotifier {
     _p = await SharedPreferences.getInstance();
     apiKey = _p.getString('apiKey') ?? apiKey;
     model = _p.getString('model') ?? model;
+    privateAudio = _p.getBool('privateAudio') ?? privateAudio;
     myName = _p.getString('myName') ?? myName;
     myRole = _p.getString('myRole') ?? myRole;
     localeId = _p.getString('localeId') ?? localeId;
@@ -33,6 +36,7 @@ class AppSettings extends ChangeNotifier {
     String? myName,
     String? myRole,
     String? localeId,
+    bool? privateAudio,
     int? intervalSec,
     int? newsMin,
     List<double>? columns,
@@ -42,6 +46,7 @@ class AppSettings extends ChangeNotifier {
     if (myName != null) await _p.setString('myName', this.myName = myName);
     if (myRole != null) await _p.setString('myRole', this.myRole = myRole);
     if (localeId != null) await _p.setString('localeId', this.localeId = localeId);
+    if (privateAudio != null) await _p.setBool('privateAudio', this.privateAudio = privateAudio);
     if (intervalSec != null) {
       await _p.setInt('intervalSec', this.intervalSec = intervalSec);
     }

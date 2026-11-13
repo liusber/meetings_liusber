@@ -22,6 +22,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late String _locale = st.localeId;
   late final _level = TextEditingController(text: st.englishLevel);
   late double _interval = st.intervalSec.toDouble();
+  late bool _private = st.privateAudio;
   late double _newsMin = st.newsMin.toDouble();
   bool _hideKey = true;
 
@@ -67,6 +68,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       localeId: _locale,
       englishLevel: _level.text,
       intervalSec: _interval.round(),
+      privateAudio: _private,
       newsMin: _newsMin.round(),
     );
     if (mounted) Navigator.pop(context);
@@ -145,6 +147,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
               onChanged: (v) => setState(() => _locale = v ?? _locale),
             ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Transcripción privada (en el equipo)'),
+              subtitle: const Text('El audio no sale de tu Mac o iPhone, pero es algo menos precisa. '
+                  'Úsala en juntas confidenciales; apagada transcribe mejor.'),
+              value: _private,
+              onChanged: (v) => setState(() => _private = v),
+            ),
             const SizedBox(height: 8),
             TextField(
               controller: _level,
@@ -163,7 +173,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Privacidad: la transcripción y tus notas se guardan solo en este equipo; en Mac y iPhone el audio se transcribe sin salir de él. '
+              'Privacidad: la transcripción y tus notas se guardan solo en este equipo. Con la transcripción privada, en Mac y iPhone el audio tampoco sale de él. '
               'Para darte sugerencias se envía un fragmento a Gemini (Google). '
               'Avisa a la otra persona que estás transcribiendo.',
               style: Theme.of(context).textTheme.bodySmall,
