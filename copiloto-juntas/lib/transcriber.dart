@@ -121,6 +121,9 @@ class Transcriber extends ChangeNotifier {
           listenMode: ListenMode.dictation,
           cancelOnError: false,
           autoPunctuation: true,
+          // En Android pide el reconocedor del teléfono (sin mandar el audio)
+          // cuando el teléfono lo tiene; si no, el sistema prefiere sin conexión.
+          onDevice: Platform.isAndroid,
         ),
       );
     } catch (e) {
@@ -165,6 +168,13 @@ class Transcriber extends ChangeNotifier {
     if (e.errorMsg.contains('permission')) {
       _want = false;
       error = 'Sin permiso de micrófono o reconocimiento de voz.';
+      notifyListeners();
+      return;
+    }
+    if (e.errorMsg.contains('language')) {
+      _want = false;
+      error = 'Falta el idioma para transcribir sin internet. En el teléfono: Ajustes → '
+          'Sistema → Idiomas → Reconocimiento de voz sin conexión, y descarga el idioma de la junta.';
       notifyListeners();
       return;
     }
