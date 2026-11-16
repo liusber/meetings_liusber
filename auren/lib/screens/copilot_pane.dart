@@ -30,7 +30,7 @@ class CopilotPane extends StatelessWidget {
           Expanded(
             child: Text(
               news
-                  ? (running && newsMin > 0 ? 'Noticias tech · cada $newsMin min' : 'Noticias tech')
+                  ? (running && newsMin > 0 ? 'Noticias autos · cada $newsMin min' : 'Noticias autos')
                   : (running ? 'Guía · cada ${session.settings.intervalSec} s' : 'Guía PM de TI'),
               style: Theme.of(context).textTheme.titleSmall,
             ),
@@ -41,14 +41,10 @@ class CopilotPane extends StatelessWidget {
               child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)),
             ),
           if (news) ...[
-            TextButton(
-              onPressed: busy ? null : () => session.news(apple: true),
-              child: const Text('Apple'),
-            ),
             FilledButton.tonalIcon(
               onPressed: busy ? null : session.news,
               icon: const Icon(Icons.search),
-              label: const Text('Tech'),
+              label: const Text('Buscar'),
             ),
           ] else
             FilledButton.tonalIcon(
@@ -75,9 +71,9 @@ class CopilotPane extends StatelessWidget {
                   padding: const EdgeInsets.all(24),
                   child: Text(
                     news
-                        ? 'Aquí llegan noticias reales de tecnología para comentar, '
-                            'incluidas las de Apple (iPhone, iPad, Mac, fechas de lanzamiento).\n'
-                            'Toca “Tech” o “Apple” para pedir una ahora.'
+                        ? 'Aquí llegan noticias automotrices reales para comentar: '
+                            'AMDA, El Economista, El Financiero, Automotive News, Motor1 y más.\n'
+                            'Toca “Buscar” para pedir una ahora.'
                         : 'Empieza a escuchar o toca “Guíame ahora”.\n'
                             'Aquí verás requerimientos detectados, preguntas, objeciones, '
                             'qué automatizar y datos de TI para compartir.',

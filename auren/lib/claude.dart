@@ -23,6 +23,7 @@ class ClaudeClient {
   Future<({String text, List<({String title, String url})> sources})> searchText({
     required String system,
     required String prompt,
+    List<String> allowedDomains = const [],
   }) async {
     final messages = <Map<String, dynamic>>[
       {'role': 'user', 'content': prompt},
@@ -35,7 +36,12 @@ class ClaudeClient {
         'system': system,
         'messages': messages,
         'tools': [
-          {'type': 'web_search_20260209', 'name': 'web_search', 'max_uses': 5},
+          {
+            'type': 'web_search_20260209',
+            'name': 'web_search',
+            'max_uses': 5,
+            if (allowedDomains.isNotEmpty) 'allowed_domains': allowedDomains,
+          },
         ],
         // Revisar fechas de varias páginas pide algo más de esfuerzo.
         'output_config': {'effort': 'medium'},

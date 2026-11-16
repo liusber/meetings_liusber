@@ -22,7 +22,6 @@ class MeetingSession extends ChangeNotifier {
   bool fetchingNews = false;
   String? copilotError;
   String? newsError;
-  int _newsRound = 0;
   bool _disposed = false;
 
   Timer? _coachTimer;
@@ -37,21 +36,19 @@ class MeetingSession extends ChangeNotifier {
     _startNews();
   }
 
-  /// Las noticias llegan solas desde que abres la junta (una tech y una de
-  /// Apple) y se renuevan cada [AppSettings.newsMin] minutos, escuches o no.
+  /// Las noticias automotrices llegan solas desde que abres la junta y se renuevan cada [AppSettings.newsMin] minutos, escuches o no.
   /// Las juntas viejas no buscan noticias.
   Future<void> _startNews() async {
     if (settings.newsMin <= 0 || settings.activeKey.isEmpty) return;
     if (DateTime.now().difference(meeting.date) > const Duration(hours: 12)) return;
     _newsTimer = Timer.periodic(
-        Duration(minutes: settings.newsMin), (_) => news(apple: (_newsRound++).isOdd));
+        Duration(minutes: settings.newsMin), (_) => news());
     final last = meeting.tips.where((t) => t.noticia.isNotEmpty).firstOrNull;
     if (last != null &&
         DateTime.now().difference(last.date) < Duration(minutes: settings.newsMin)) {
       return;
     }
     await news();
-    if (!_disposed) await news(apple: true);
   }
 
   ClaudeClient get _client => ClaudeClient(settings.activeKey, settings.model);
@@ -163,15 +160,16 @@ class MeetingSession extends ChangeNotifier {
     }
   }
 
-  /// Noticia real de tecnología (búsqueda web) para comentar en la junta.
-  Future<void> news({bool apple = false}) async {
+  /// Noticia automotriz real (AMDA y prensa del sector) para comentar en la junta.
+  Future<void> news() async {
     if (fetchingNews) return;
     fetchingNews = true;
     notifyListeners();
     final text = liveTranscript;
     try {
       final r = await _client.searchText(
-        system: newsSystem(DateTime.now(), apple: apple),
+        system: newsSystem(DateTime.now()),
+        allowedDomains: newsDomains,
         prompt: newsPrompt(meeting, text.length > 3000 ? text.substring(text.length - 3000) : text),
       );
       String field(String name) {

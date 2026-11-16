@@ -60,9 +60,25 @@ const coachSchema = {
   'propertyOrdering': ['lectura', 'requerimiento', 'preguntas', 'objeciones', 'automatizar', 'nota_it', 'nota_tipo', 'correos'],
 };
 
-String newsSystem(DateTime today, {bool apple = false}) => '''
-Buscas en la web UNA noticia real y reciente (últimos 30 días; hoy es ${today.day}/${today.month}/${today.year}) del mundo de la tecnología, para comentarla en voz alta en una junta.
-${apple ? 'Esta vez la noticia es de Apple: nuevos iPhone, iPad, Mac, Apple Watch, AirPods, Vision, iOS/macOS, Apple Intelligence, fechas de eventos y lanzamientos, precios en México, o lo que se rumora del próximo producto. Si hay una fecha de evento o de venta próxima, dala.' : 'Prefiere algo relacionado con el tema de la junta (IA, automatización, nube, ciberseguridad, sector automotriz, software empresarial). Si no hay tema claro, la noticia de tecnología más relevante de la semana, incluidos lanzamientos de Apple, Google, Microsoft, Samsung u OpenAI.'}
+/// Medios donde se buscan las noticias: AMDA y la prensa automotriz de México y EE. UU.
+const newsDomains = [
+  'amda.mx',
+  'amia.com.mx',
+  'eleconomista.com.mx',
+  'elfinanciero.com.mx',
+  'autocosmos.com.mx',
+  'motorpasion.com.mx',
+  'autonews.com',
+  'motortrend.com',
+  'caranddriver.com',
+  'thedrive.com',
+  'motor1.com',
+];
+
+String newsSystem(DateTime today) => '''
+Buscas en la web UNA noticia real y reciente (últimos 30 días; hoy es ${today.day}/${today.month}/${today.year}) del sector automotriz, para comentarla en voz alta en una junta.
+Solo de estos medios: AMDA (Asociación Mexicana de Distribuidores de Automotores), AMIA, El Economista, El Financiero, Autocosmos, Motorpasión México, Automotive News, MotorTrend, Car and Driver, The Drive y Motor1.
+Prefiere lo que sirva a distribuidores y agencias en México: ventas mensuales (AMDA, INEGI), cifras por marca, lanzamientos y precios, aranceles y T-MEC, marcas chinas, electrificación, financiamiento y posventa. Si la junta toca una marca o tema concreto, búscalo primero.
 Solo vale si se publicó después del ${today.subtract(const Duration(days: 30)).day}/${today.subtract(const Duration(days: 30)).month}/${today.subtract(const Duration(days: 30)).year}. Revisa la fecha de publicación de la página: muchas notas viejas aparecen primero en la búsqueda, descártalas.
 No inventes: si no encuentras una noticia verificable y reciente, responde solo NADA.
 Español de México. Responde exactamente en 3 líneas:
