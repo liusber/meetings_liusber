@@ -113,11 +113,23 @@ public class DictationPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
 
   private func startEngine() throws {
     let input = engine.inputNode
-    let format = input.outputFormat(forBus: 0)
+    if tapInstalled {
+      input.removeTap(onBus: 0)
+      tapInstalled = false
+    }
+    // El tap debe usar el formato real del micrófono. Si se pone otro (pasa
+    // justo después de cambiar de micrófono), AVAudioEngine lanza una
+    // excepción que Swift no puede atrapar y cierra la app.
+    let format = input.inputFormat(forBus: 0)
     guard format.channelCount > 0, format.sampleRate > 0 else {
       throw err("No encontré un micrófono disponible.")
     }
-    if tapInstalled { input.removeTap(onBus: 0) }
+    // Mientras el cambio de micrófono no termina, los dos formatos no
+    // coinciden: se espera y se reintenta en vez de arriesgar el cierre.
+    let out = input.outputFormat(forBus: 0)
+    guard out.sampleRate == format.sampleRate, out.channelCount == format.channelCount else {
+      throw err("El micrófono está cambiando; reintentando.")
+    }
     input.installTap(onBus: 0, bufferSize: 2048, format: format) { [weak self] buffer, _ in
       guard let self else { return }
       self.requestLock.lock()
@@ -215,6 +227,8 @@ public class DictationPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
   private func reconnect(attempt: Int) {
     guard running else { return }
     if engine.isRunning { engine.stop() }
+    // Olvida el formato del micrófono anterior antes de leer el nuevo.
+    engine.reset()
     do {
       try startEngine()
       rotate()
